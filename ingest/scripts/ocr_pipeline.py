@@ -2,6 +2,10 @@
 import os
 import sys
 from pathlib import Path
+
+# CRITICAL: Add poppler to PATH before importing pdf2image
+os.environ['PATH'] = '/opt/homebrew/bin:/usr/local/bin:' + os.environ.get('PATH', '')
+
 from pdf2image import convert_from_path
 from PIL import Image
 import pytesseract
@@ -44,7 +48,9 @@ class OCRPipeline:
         print(f"Converting {pdf_path.name} to images...")
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        images = convert_from_path(str(pdf_path), dpi=300)
+        # Explicitly pass poppler_path for pdf2image
+        poppler_path = "/opt/homebrew/bin" if Path("/opt/homebrew/bin/pdfinfo").exists() else "/usr/local/bin"
+        images = convert_from_path(str(pdf_path), dpi=300, poppler_path=poppler_path)
         image_paths = []
 
         for i, image in enumerate(images):

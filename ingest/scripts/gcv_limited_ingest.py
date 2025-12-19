@@ -25,7 +25,9 @@ class LimitedOCRPipeline(OCRPipeline):
         print(f"Converting first {max_pages} pages of {pdf_path.name}...")
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        images = convert_from_path(str(pdf_path), dpi=300, first_page=1, last_page=max_pages)
+        # Explicitly pass poppler_path
+        poppler_path = "/opt/homebrew/bin" if Path("/opt/homebrew/bin/pdfinfo").exists() else "/usr/local/bin"
+        images = convert_from_path(str(pdf_path), dpi=300, first_page=1, last_page=max_pages, poppler_path=poppler_path)
         image_paths = []
 
         for i, image in enumerate(images):
