@@ -57,7 +57,7 @@ class OCRPipeline:
 
     def ocr_image(self, image_path: Path) -> str:
         """
-        Perform OCR on image to extract Arabic text.
+        Perform OCR on image to extract Arabic text using Google Cloud Vision API.
 
         Args:
             image_path: Path to image file
@@ -65,12 +65,36 @@ class OCRPipeline:
         Returns:
             Extracted text
         """
-        image = Image.open(image_path)
+        from google.cloud import vision
+        import os
 
-        # Use Tesseract with Arabic language support
-        text = pytesseract.image_to_string(image, lang='ara')
+        # Ensure credentials are set
+        if not os.getenv('GOOGLE_APPLICATION_CREDENTIALS'):
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = str(
+                Path(__file__).parent.parent.parent / 'huss-google-cloud-key.json'
+            )
 
-        return text.strip()
+        client = vision.ImageAnnotatorClient()
+
+        # Read image file
+        with open(image_path, 'rb') as image_file:
+            content = image_file.read()
+
+        image = vision.Image(content=content)
+
+        # Perform document text detection with Arabic language hint
+        response = client.document_text_detection(
+            image=image,
+            image_context={"language_hints": ["ar"]}
+        )
+
+        if response.error.message:
+            raise Exception(f'Google Cloud Vision API Error: {response.error.message}')
+
+        # Extract full text
+        text = response.full_text_annotation.text
+
+        return text.strip() if text else ""
 
     def chunk_text(
         self,

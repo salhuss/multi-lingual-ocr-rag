@@ -144,6 +144,18 @@ ENV/
 env.bak/
 venv.bak/
 
+# Google Cloud credentials (NEVER commit these!)
+*google-cloud-key*.json
+*-google-cloud-key.json
+service-account*.json
+
+# Processed OCR data (images and generated files)
+data/processed_gcv/
+data/processed_tesseract/
+*.png
+*.jpg
+*.jpeg
+
 # Spyder project settings
 .spyderproject
 .spyproject

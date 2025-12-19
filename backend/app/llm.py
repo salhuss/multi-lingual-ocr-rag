@@ -50,7 +50,7 @@ CRITICAL RULES:
 7. If sources conflict, present both views with citations
 8. Keep answers concise (2-4 sentences) unless more detail is needed
 
-Output format:
+Respond in JSON format with the following structure:
 {
   "answer": "Your concise answer in English with citations [Book, Page X]",
   "citations": [
