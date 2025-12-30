@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: hajj-rag-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SIMILARITY_THRESHOLD
+        value: "0.35"
+      - key: RETRIEVAL_TOP_K
+        value: "5"
+      - key: LLM_MODEL
+        value: "gpt-4o-mini"
+      - key: EMBEDDING_MODEL
+        value: "text-embedding-3-small"
+      - key: LLM_TEMPERATURE
+        value: "0.1"
+      - key: MAX_TOKENS
+        value: "800"
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+    healthCheckPath: /health

@@ -36,7 +36,7 @@ class OCRPipeline:
 
     def convert_pdf_to_images(self, pdf_path: Path, output_dir: Path) -> List[Path]:
         """
-        Convert PDF pages to images.
+        Convert PDF pages to images in batches to avoid memory issues.
 
         Args:
             pdf_path: Path to PDF file
@@ -45,20 +45,42 @@ class OCRPipeline:
         Returns:
             List of image paths
         """
+        from pdf2image.pdf2image import pdfinfo_from_path
+
         print(f"Converting {pdf_path.name} to images...")
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Explicitly pass poppler_path for pdf2image
         poppler_path = "/opt/homebrew/bin" if Path("/opt/homebrew/bin/pdfinfo").exists() else "/usr/local/bin"
-        images = convert_from_path(str(pdf_path), dpi=300, poppler_path=poppler_path)
+
+        # Get total page count
+        info = pdfinfo_from_path(str(pdf_path), poppler_path=poppler_path)
+        total_pages = info['Pages']
+        print(f"  Total pages: {total_pages}")
+
+        # Convert in batches of 50 pages to avoid memory issues
+        batch_size = 50
         image_paths = []
 
-        for i, image in enumerate(images):
-            image_path = output_dir / f"page_{i+1:04d}.png"
-            image.save(str(image_path), "PNG")
-            image_paths.append(image_path)
+        for start_page in range(1, total_pages + 1, batch_size):
+            end_page = min(start_page + batch_size - 1, total_pages)
+            print(f"  Converting pages {start_page}-{end_page}/{total_pages}...")
 
-        print(f"  Converted {len(images)} pages")
+            images = convert_from_path(
+                str(pdf_path),
+                dpi=300,
+                first_page=start_page,
+                last_page=end_page,
+                poppler_path=poppler_path
+            )
+
+            for i, image in enumerate(images):
+                page_num = start_page + i
+                image_path = output_dir / f"page_{page_num:04d}.png"
+                image.save(str(image_path), "PNG")
+                image_paths.append(image_path)
+
+        print(f"  ✓ Converted {len(image_paths)} pages")
         return image_paths
 
     def ocr_image(self, image_path: Path) -> str:

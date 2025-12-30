@@ -156,6 +156,22 @@ data/processed_tesseract/
 *.jpg
 *.jpeg
 
+# Deployment exports (large files)
+backend/supabase_data.sql
+backend/supabase_data.json
+
+# Frontend (Next.js)
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+frontend/.env.local
+frontend/.env.production.local
+frontend/.env.development.local
+frontend/.env.test.local
+
+# Vercel
+.vercel
+
 # Spyder project settings
 .spyderproject
 .spyproject

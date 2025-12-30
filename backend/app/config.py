@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # Retrieval
     retrieval_top_k: int = int(os.getenv("RETRIEVAL_TOP_K", "5"))
-    similarity_threshold: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.7"))
+    similarity_threshold: float = float(os.getenv("SIMILARITY_THRESHOLD", "0.35"))
 
     class Config:
         env_file = ".env"
